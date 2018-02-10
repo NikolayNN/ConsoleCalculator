@@ -2,6 +2,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import service.Calculator;
+import service.ExpressionHandler;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -14,7 +16,7 @@ public class CalculatorTest {
 
     @Before
     public void setUp() throws Exception {
-        calculator = new Calculator();
+        calculator = new Calculator(new ExpressionHandler());
     }
 
     @Test
@@ -508,7 +510,7 @@ public class CalculatorTest {
     public void calc45() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(is("Please check your input. The token is not available: '3a'"));
+        expectedException.expectMessage(is("Please check your input. The token is unacceptable: '3a'"));
 
         String expression = "(4 + 3a) * 2 ^ -2";
 
@@ -531,6 +533,39 @@ public class CalculatorTest {
 
         String expression = "10^(-(5-6)";
         double expected = 10.0;
+
+        double actual = calculator.calc(expression);
+
+        assertEquals(expected, actual, 0);
+    }
+
+    @Test
+    public void calc48() throws Exception {
+
+        String expression = "1.0 + 2.0 + 3.0";
+        double expected = 6.0;
+
+        double actual = calculator.calc(expression);
+
+        assertEquals(expected, actual, 0);
+    }
+
+    @Test
+    public void calc49() throws Exception {
+
+        String expression = "1.0 + 2,0 + 3.0";
+        double expected = 6.0;
+
+        double actual = calculator.calc(expression);
+
+        assertEquals(expected, actual, 0);
+    }
+
+    @Test
+    public void calc50() throws Exception {
+
+        String expression = "1,0 + 2,0 + 3,0";
+        double expected = 6.0;
 
         double actual = calculator.calc(expression);
 
