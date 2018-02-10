@@ -5,6 +5,8 @@ import service.ExpressionHandler;
 import view.Console;
 import view.View;
 
+import java.math.BigDecimal;
+
 public class Controller {
 
     public void run() {
@@ -20,8 +22,8 @@ public class Controller {
                 break;
             }else{
                 try {
-                    double result = calculator.calc(expression);
-                    view.write(String.format("result: %s", Double.toString(result)));
+                    BigDecimal result = calculator.calc(expression);
+                    view.write(String.format("result: %s", result.toString()));
                 }catch (Exception ex){
                     view.write(ex.getMessage());
                 }

@@ -1,5 +1,7 @@
 package service;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -22,7 +24,7 @@ public class Calculator {
     private final String AVAILABLE_FUNCTIONS = SIGN_PLUS + SIGN_MINUS + SIGN_MULTIPLICATION + SIGN_DIVISION
             + SIGN_DEGREE;
 
-    public double calc(String expression) {
+    public BigDecimal calc(String expression) {
 
         StringTokenizer expressionTokens = new StringTokenizer(expressionHandler.prepare(expression),
                 AVAILABLE_FUNCTIONS + OPEN_BRACKET + CLOSE_BRACKET, true);
@@ -66,7 +68,7 @@ public class Calculator {
             }
         }
 
-        return Double.parseDouble(operands.get(0));
+        return new BigDecimal(operands.get(0));
     }
 
     private int getPrecedence(String operator) {
@@ -90,28 +92,27 @@ public class Calculator {
 
     private String doFunction(String b, String a, String operator) {
 
-        double numbA = Double.parseDouble(a);
-        double numbB = Double.parseDouble(b);
+        BigDecimal numbA = new BigDecimal(a);
+        BigDecimal numbB = new BigDecimal(b);
 
         if (operator.equals(SIGN_MINUS)) {
-            return String.valueOf(numbA - numbB);
+            return String.valueOf(numbA.subtract(numbB).toString());
         }
         if (operator.equals(SIGN_PLUS)) {
-            return String.valueOf(numbA + numbB);
+            return String.valueOf(numbA.add(numbB).toString());
         }
         if (operator.equals(SIGN_MULTIPLICATION)) {
-            return String.valueOf(numbA * numbB);
+            return String.valueOf(numbA.multiply(numbB).toString());
         }
         if (operator.equals(SIGN_DIVISION)) {
-            return String.valueOf(numbA / numbB);
+            return String.valueOf(numbA.divide(numbB).toString());
         }
         if (operator.equals(SIGN_DEGREE)) {
-            return String.valueOf(Math.pow(numbA, numbB));
+            return String.valueOf(numbA.pow(Integer.valueOf(b), MathContext.DECIMAL64));
         }
 
         throw new IllegalArgumentException(String.format("Please check your input. Function '%s' is not available", operator));
     }
-
 
     private boolean isOpenBracket(String token) {
         return token.equals("(");
@@ -127,7 +128,7 @@ public class Calculator {
 
     private boolean isNumber(String token) {
         try {
-            Double.parseDouble(token);
+            new BigDecimal(token);
         } catch (NumberFormatException ex) {
             return false;
         }
