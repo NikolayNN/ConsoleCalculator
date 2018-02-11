@@ -45,7 +45,7 @@ public class ExpressionHandler {
 
         if (!wrongInputs.toString().trim().equals("")) {
             throw new IllegalArgumentException(
-                    String.format("Please, don't use spaces between digits." +
+                    String.format("Don't use spaces between digits." +
                             " Wrong inputs: %s", wrongInputs.toString().trim()));
         }
     }

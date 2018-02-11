@@ -2,6 +2,8 @@ package service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -15,22 +17,40 @@ public class Calculator {
     private final String OPEN_BRACKET = "(";
     private final String CLOSE_BRACKET = ")";
 
+    private final String AVAILABLE_FUNCTIONS = SIGN_PLUS + SIGN_MINUS + SIGN_MULTIPLICATION + SIGN_DIVISION
+            + SIGN_DEGREE;
+
+    private final int PRECENDENCE_SUM_AND_DIFFERENCE = 1;
+    private final int PRECENDENCE_DIVISION_AND_MULTIPLICATION = 2;
+    private final int PRECENDENCE_DEGREE = 3;
+
+    private final int ACCURACY = 15;
+
     private ExpressionHandler expressionHandler;
 
     public Calculator(ExpressionHandler expressionHandler) {
         this.expressionHandler = expressionHandler;
     }
 
-    private final String AVAILABLE_FUNCTIONS = SIGN_PLUS + SIGN_MINUS + SIGN_MULTIPLICATION + SIGN_DIVISION
-            + SIGN_DEGREE;
 
-    public BigDecimal calc(String expression) {
+    public String calc(String expression) {
+
+        Stack<String> operands = new Stack();
+        Stack<String> functions = new Stack();
 
         StringTokenizer expressionTokens = new StringTokenizer(expressionHandler.prepare(expression),
                 AVAILABLE_FUNCTIONS + OPEN_BRACKET + CLOSE_BRACKET, true);
 
-        Stack<String> operands = new Stack();
-        Stack<String> functions = new Stack();
+        String result;
+        try {
+            result = solve(operands, functions, expressionTokens);
+        } catch (EmptyStackException ex){
+            throw new IllegalArgumentException("Wrong count of mathematical signs.");
+        }
+        return result;
+    }
+
+    private String solve(Stack<String> operands, Stack<String> functions, StringTokenizer expressionTokens) {
 
         while (expressionTokens.hasMoreTokens()) {
 
@@ -46,11 +66,11 @@ public class Calculator {
             }
             if (!isFunction(token) && !token.equals(CLOSE_BRACKET)) {
                 throw new IllegalArgumentException(
-                        String.format("Please check your input. The token is unacceptable: '%s'", token));
+                        String.format("The token is unacceptable: '%s'", token));
             }
 
             if (functions.size() > 0) {
-                if (getPrecedence(functions.lastElement()) <= getPrecedence(token)) {
+                if (getPrecedence(functions.lastElement()) >= getPrecedence(token)) {
                     if (isCloseBracket(token)) {
                         String currentFunction;
                         while (!isOpenBracket((currentFunction = functions.pop()))) {
@@ -68,24 +88,25 @@ public class Calculator {
             }
         }
 
-        return new BigDecimal(operands.get(0));
+        if (operands.size() == 1 && functions.size() == 0) {
+            return new BigDecimal(operands.get(0)).stripTrailingZeros().toPlainString();
+        } else {
+            throw new RuntimeException("Wrong count of open and close brackets.");
+        }
     }
 
     private int getPrecedence(String operator) {
         if (operator.equals(SIGN_PLUS) || operator.equals(SIGN_MINUS)) {
-            return 3;
+            return PRECENDENCE_SUM_AND_DIFFERENCE;
         }
         if (operator.equals(SIGN_MULTIPLICATION) || operator.equals(SIGN_DIVISION)) {
-            return 2;
+            return PRECENDENCE_DIVISION_AND_MULTIPLICATION;
         }
         if (operator.equals(SIGN_DEGREE)) {
-            return 1;
+            return PRECENDENCE_DEGREE;
         }
-        if (isOpenBracket(operator)) {
-            return 4;
-        }
-        if (isCloseBracket(operator)) {
-            return 4;
+        if (isOpenBracket(operator) || isCloseBracket(operator)) {
+            return 0;
         }
         throw new IllegalArgumentException(String.format("Operator %s is unacceptable", operator));
     }
@@ -105,21 +126,21 @@ public class Calculator {
             return String.valueOf(numbA.multiply(numbB).toString());
         }
         if (operator.equals(SIGN_DIVISION)) {
-            return String.valueOf(numbA.divide(numbB).toString());
+            return String.valueOf(numbA.divide(numbB, ACCURACY,RoundingMode.HALF_UP).toString());
         }
         if (operator.equals(SIGN_DEGREE)) {
-            return String.valueOf(numbA.pow(Integer.valueOf(b), MathContext.DECIMAL64));
+            return String.valueOf(numbA.pow(Integer.valueOf(b), MathContext.DECIMAL128));
         }
 
-        throw new IllegalArgumentException(String.format("Please check your input. Function '%s' is not available", operator));
+        throw new IllegalArgumentException(String.format("Function '%s' is not available", operator));
     }
 
     private boolean isOpenBracket(String token) {
-        return token.equals("(");
+        return token.equals(OPEN_BRACKET);
     }
 
     private boolean isCloseBracket(String token) {
-        return token.equals(")");
+        return token.equals(CLOSE_BRACKET);
     }
 
     private boolean isFunction(String token) {

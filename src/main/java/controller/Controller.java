@@ -5,8 +5,6 @@ import service.ExpressionHandler;
 import view.Console;
 import view.View;
 
-import java.math.BigDecimal;
-
 public class Controller {
 
     public void run() {
@@ -20,17 +18,18 @@ public class Controller {
             String expression = view.read();
             if (expression.equalsIgnoreCase("stop")) {
                 break;
-            }else{
+            } else {
                 try {
-                    BigDecimal result = calculator.calc(expression);
-                    view.write(String.format("result: %s", result.toString()));
-                }catch (Exception ex){
+                    String result = calculator.calc(expression);
+                    view.write(String.format("result: %s", result));
+                } catch (ArithmeticException ex) {
                     view.write(ex.getMessage());
+                } catch (Exception ex) {
+                    view.write("Please, check your input. " + ex.getMessage());
                 }
             }
         }
 
         view.write("Goodbye.");
-
     }
 }
