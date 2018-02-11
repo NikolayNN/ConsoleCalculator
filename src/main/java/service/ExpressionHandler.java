@@ -1,5 +1,7 @@
 package service;
 
+import utils.Properties;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 /**
@@ -7,9 +9,10 @@ import java.util.regex.Pattern;
  */
 public class ExpressionHandler {
 
-    private final String SIGN_DEGREE = "^";
-    private final String OPEN_BRACKET = "(";
-    private final String CLOSE_BRACKET = ")";
+    private final String SIGN_MINUS = Properties.read("sign.minus");
+    private final String SIGN_DEGREE = Properties.read("sign.degree");
+    private final static String OPEN_BRACKET = Properties.read("open.bracket");
+    private final String CLOSE_BRACKET = Properties.read("close.bracket");
     private final String SEPARATOR = " ";
 
     public String prepare(String expression) {
@@ -20,10 +23,10 @@ public class ExpressionHandler {
 
         checkWrongSpacesBetweenDigits(expression);
 
-        expression = OPEN_BRACKET + expression + CLOSE_BRACKET;
+        expression = concat(OPEN_BRACKET, expression, CLOSE_BRACKET);
         expression = expression
                 .replace(SEPARATOR, "")
-                .replace("(-", "(0-")
+                .replace(concat(OPEN_BRACKET, SIGN_MINUS), concat(OPEN_BRACKET, "0", SIGN_MINUS))
                 .replace(",","." );
 
         expression = handleNegativeDegrees(expression);
@@ -35,18 +38,16 @@ public class ExpressionHandler {
 
         Pattern pattern = Pattern.compile("\\d+\\s+\\d+");
         Matcher matcher = pattern.matcher(expression);
-        StringBuilder wrongInputs = new StringBuilder();
 
+        String wrongInputs = "";
         while (matcher.find()) {
-            wrongInputs
-                    .append("'").append(matcher.group()).append("'")
-                    .append(" ");
+            wrongInputs = String.format("'%s' ", matcher.group());
         }
 
-        if (!wrongInputs.toString().trim().equals("")) {
+        if (!wrongInputs.trim().equals("")) {
             throw new IllegalArgumentException(
                     String.format("Don't use spaces between digits." +
-                            " Wrong inputs: %s", wrongInputs.toString().trim()));
+                            " Wrong inputs: %s", wrongInputs.trim()));
         }
     }
 
@@ -56,18 +57,20 @@ public class ExpressionHandler {
             return expression;
         }
 
-        final String NEGATIVE_NUMBER_DEGREE_WITHOUT_BRACKETS = "^-";
-        final String NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS = "^-(";
+        final String NEGATIVE_NUMBER_DEGREE_WITHOUT_BRACKETS = concat(SIGN_DEGREE, SIGN_MINUS);
+        final String NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS = concat(SIGN_DEGREE,  SIGN_MINUS, OPEN_BRACKET);
 
-        String[] splitted = expression.split("(?=\\^)");
+        String[] splitted = expression.split("(?=\\" + SIGN_DEGREE + ")");
         for (int i = 0; i < splitted.length; i++) {
             if (splitted[i].startsWith(NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS)) {
                 int j = NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS.length();
                 StringBuilder degreeValue = new StringBuilder();
-                while (splitted[i].charAt(j) != ')') {
+                while (splitted[i].charAt(j) != toChar(CLOSE_BRACKET)) {
                     degreeValue.append(splitted[i].charAt(j++));
                 }
-                splitted[i] = String.format("^(0-(%s)%s", degreeValue.toString(), splitted[i].substring(j));
+                //^(0-%s)%s
+                splitted[i] = concat(SIGN_DEGREE, OPEN_BRACKET, "0", SIGN_MINUS,
+                        OPEN_BRACKET, degreeValue.toString(), CLOSE_BRACKET, splitted[i].substring(j));
             }
             if (splitted[i].startsWith(NEGATIVE_NUMBER_DEGREE_WITHOUT_BRACKETS)) {
                 int j = NEGATIVE_NUMBER_DEGREE_WITHOUT_BRACKETS.length();
@@ -75,9 +78,24 @@ public class ExpressionHandler {
                 while (Character.isDigit(splitted[i].charAt(j))) {
                     degreeValue.append(splitted[i].charAt(j++));
                 }
-                splitted[i] = String.format("^(0-%s)%s", degreeValue.toString(), splitted[i].substring(j));
+                //^(0-%s)%s
+                splitted[i] = concat(SIGN_DEGREE, OPEN_BRACKET, "0", SIGN_MINUS, degreeValue.toString(), CLOSE_BRACKET,
+                        splitted[i].substring(j));
             }
         }
         return String.join("", splitted);
+    }
+
+    private String concat(String ... strings ){
+
+        StringBuilder result = new StringBuilder();
+        for (String s : strings) {
+            result.append(s);
+        }
+        return result.toString();
+    }
+
+    private char toChar(String str){
+        return str.charAt(0);
     }
 }

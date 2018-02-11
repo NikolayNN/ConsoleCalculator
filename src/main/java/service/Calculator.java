@@ -1,5 +1,7 @@
 package service;
 
+import utils.Properties;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -9,22 +11,22 @@ import java.util.StringTokenizer;
 
 public class Calculator {
 
-    private final String SIGN_PLUS = "+";
-    private final String SIGN_MINUS = "-";
-    private final String SIGN_MULTIPLICATION = "*";
-    private final String SIGN_DIVISION = "/";
-    private final String SIGN_DEGREE = "^";
-    private final String OPEN_BRACKET = "(";
-    private final String CLOSE_BRACKET = ")";
+    private final String SIGN_PLUS = Properties.read("sign.plus");
+    private final String SIGN_MINUS = Properties.read("sign.minus");
+    private final String SIGN_MULTIPLICATION = Properties.read("sign.multiplication");
+    private final String SIGN_DIVISION = Properties.read("sign.division");
+    private final String SIGN_DEGREE = Properties.read("sign.degree");
+    private final String OPEN_BRACKET = Properties.read("open.bracket");
+    private final String CLOSE_BRACKET = Properties.read("close.bracket");
 
     private final String AVAILABLE_FUNCTIONS = SIGN_PLUS + SIGN_MINUS + SIGN_MULTIPLICATION + SIGN_DIVISION
             + SIGN_DEGREE;
 
-    private final int PRECENDENCE_SUM_AND_DIFFERENCE = 1;
-    private final int PRECENDENCE_DIVISION_AND_MULTIPLICATION = 2;
-    private final int PRECENDENCE_DEGREE = 3;
+    private final int PRECEDENCE_SUM_AND_DIFFERENCE = Properties.readInt("precedence.sum.and.difference");
+    private final int PRECEDENCE_DIVISION_AND_MULTIPLICATION = Properties.readInt("precedence.division.and.multiplication");
+    private final int PRECEDENCE_DEGREE = Properties.readInt("precedence.degree");
 
-    private final int ACCURACY = 15;
+    private final int ACCURACY = Properties.readInt("accuracy");
 
     private ExpressionHandler expressionHandler;
 
@@ -97,13 +99,13 @@ public class Calculator {
 
     private int getPrecedence(String operator) {
         if (operator.equals(SIGN_PLUS) || operator.equals(SIGN_MINUS)) {
-            return PRECENDENCE_SUM_AND_DIFFERENCE;
+            return PRECEDENCE_SUM_AND_DIFFERENCE;
         }
         if (operator.equals(SIGN_MULTIPLICATION) || operator.equals(SIGN_DIVISION)) {
-            return PRECENDENCE_DIVISION_AND_MULTIPLICATION;
+            return PRECEDENCE_DIVISION_AND_MULTIPLICATION;
         }
         if (operator.equals(SIGN_DEGREE)) {
-            return PRECENDENCE_DEGREE;
+            return PRECEDENCE_DEGREE;
         }
         if (isOpenBracket(operator) || isCloseBracket(operator)) {
             return 0;

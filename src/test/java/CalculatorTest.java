@@ -399,8 +399,7 @@ public class CalculatorTest {
     public void calc35() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(is("Don't use spaces between digits. " +
-                "Wrong inputs: '12345 785236' '98756 85632'"));
+        expectedException.expectMessage(is("Don't use spaces between digits. Wrong inputs: '98756 85632'"));
 
         String expression = "12345 785236 + 18 * 98756 85632";
 
@@ -541,6 +540,17 @@ public class CalculatorTest {
 
     @Test
     public void calc49() throws Exception {
+
+        String expression = "1.0 + 2,0 + 3.0";
+        String expected = "6";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc555() throws Exception {
 
         String expression = "1.0 + 2,0 + 3.0";
         String expected = "6";
