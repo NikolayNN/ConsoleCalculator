@@ -77,7 +77,6 @@ public class ExpressionHandler {
                 while (splitted[i].charAt(j) != toChar(CLOSE_BRACKET)) {
                     degreeValue.append(splitted[i].charAt(j++));
                 }
-                //^(0-%s)%s
                 splitted[i] = concat(SIGN_DEGREE, OPEN_BRACKET, "0", SIGN_MINUS,
                         OPEN_BRACKET, degreeValue.toString(), CLOSE_BRACKET, splitted[i].substring(j));
             }
@@ -87,7 +86,6 @@ public class ExpressionHandler {
                 while (Character.isDigit(splitted[i].charAt(j))) {
                     degreeValue.append(splitted[i].charAt(j++));
                 }
-                //^(0-%s)%s
                 splitted[i] = concat(SIGN_DEGREE, OPEN_BRACKET, "0", SIGN_MINUS, degreeValue.toString(), CLOSE_BRACKET,
                         splitted[i].substring(j));
             }
