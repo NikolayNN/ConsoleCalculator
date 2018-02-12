@@ -20,7 +20,7 @@ public class HelpCommand extends Command {
     @Override
     public String perform() {
 
-        String result = "This is cmd calculator. The calculator supports next operations " + LINE_SEPARATOR +
+        String result = "This is a cmd calculator. The calculator supports next operations " + LINE_SEPARATOR +
                     "\tAddition: " + SIGN_PLUS + LINE_SEPARATOR +
                     "\tSubtraction: " + SIGN_MINUS + LINE_SEPARATOR +
                     "\tMultiplication: " + SIGN_MULTIPLICATION + LINE_SEPARATOR +
@@ -33,8 +33,8 @@ public class HelpCommand extends Command {
                 "You can use '.' or/and ',' like delimiter of decimal places. You will get result always with '.'" + LINE_SEPARATOR + LINE_SEPARATOR +
                 "You can put spaces between numbers and operators, but you can't put spaces between digits." + LINE_SEPARATOR +
                 "Available commands: " + LINE_SEPARATOR +
-                    "\tstop - for end the programm" + LINE_SEPARATOR +
-                    "\thelp - for get the information" + LINE_SEPARATOR + LINE_SEPARATOR +
+                    "\tstop - end the programm" + LINE_SEPARATOR +
+                    "\thelp - get the information" + LINE_SEPARATOR + LINE_SEPARATOR +
                 "How to work with the program: " + LINE_SEPARATOR +
                     "\tAfter launch the program you should input expression and press enter." + LINE_SEPARATOR +
                     "\tIf calculation was successful you wil get result" + LINE_SEPARATOR +
