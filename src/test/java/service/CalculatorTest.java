@@ -1032,4 +1032,26 @@ public class CalculatorTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void calc87() throws Exception {
+
+        String expression = "(9*2 - 3^4)/(10-3) + (3*2^2 - 27)/(5+3) - (5^2 -9)";
+        String expected = "-26.875";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc88() throws Exception {
+
+        String expression = "(100/(2^2 - 3*4) + 124/(2*5 - 3^3))*(2^2*4 + 5*5^2)/(4^2 + 1^2) + 1";
+        String expected = "-163.17474048442907";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
 }
