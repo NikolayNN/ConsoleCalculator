@@ -4,6 +4,7 @@ import utils.Properties;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 /**
  * The class prepared and check expression
  */
@@ -27,7 +28,7 @@ public class ExpressionHandler {
         expression = expression
                 .replace(SEPARATOR, "")
                 .replace(concat(OPEN_BRACKET, SIGN_MINUS), concat(OPEN_BRACKET, "0", SIGN_MINUS))
-                .replace(",","." );
+                .replace(",", ".");
 
         expression = handleNegativeDegrees(expression);
 
@@ -58,9 +59,17 @@ public class ExpressionHandler {
         }
 
         final String NEGATIVE_NUMBER_DEGREE_WITHOUT_BRACKETS = concat(SIGN_DEGREE, SIGN_MINUS);
-        final String NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS = concat(SIGN_DEGREE,  SIGN_MINUS, OPEN_BRACKET);
+        final String NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS = concat(SIGN_DEGREE, SIGN_MINUS, OPEN_BRACKET);
+        final String EXPRESSION_STARTS_WITH_NEGATIVE_NUMBER = concat(OPEN_BRACKET, "0", SIGN_MINUS);
 
         String[] splitted = expression.split("(?=\\" + SIGN_DEGREE + ")");
+
+        if (splitted[0].startsWith(EXPRESSION_STARTS_WITH_NEGATIVE_NUMBER)
+                && !splitted[0].contains(OPEN_BRACKET)
+                && splitted[1].startsWith(SIGN_DEGREE)) {
+            splitted[0] = concat(OPEN_BRACKET, OPEN_BRACKET, splitted[0].substring(1), CLOSE_BRACKET);
+        }
+
         for (int i = 0; i < splitted.length; i++) {
             if (splitted[i].startsWith(NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS)) {
                 int j = NEGATIVE_EXPRESSION_DEGREE_WITHOUT_BRACKETS.length();
@@ -86,7 +95,7 @@ public class ExpressionHandler {
         return String.join("", splitted);
     }
 
-    private String concat(String ... strings ){
+    private String concat(String... strings) {
 
         StringBuilder result = new StringBuilder();
         for (String s : strings) {
@@ -95,7 +104,7 @@ public class ExpressionHandler {
         return result.toString();
     }
 
-    private char toChar(String str){
+    private char toChar(String str) {
         return str.charAt(0);
     }
 }

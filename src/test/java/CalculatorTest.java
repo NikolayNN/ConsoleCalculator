@@ -770,4 +770,47 @@ public class CalculatorTest {
         calculator.calc(expression);
     }
 
+    @Test
+    public void calc69() throws Exception {
+
+        String expression = "-(10 + 9)^2";
+        String expected = "-361";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc70() throws Exception {
+
+        String expression = "0-1^2";
+        String expected = "-1";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc71() throws Exception {
+
+        String expression = "(0-1)^2";
+        String expected = "1";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc72() throws Exception {
+
+        String expression = "-(0-1)^2";
+        String expected = "-1";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
 }
