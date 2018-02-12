@@ -12,7 +12,7 @@ public class ExpressionHandler {
 
     private final String SIGN_MINUS = Props.read("sign.minus");
     private final String SIGN_DEGREE = Props.read("sign.degree");
-    private final static String OPEN_BRACKET = Props.read("open.bracket");
+    private final String OPEN_BRACKET = Props.read("open.bracket");
     private final String CLOSE_BRACKET = Props.read("close.bracket");
 
     public String prepare(String expression) {
