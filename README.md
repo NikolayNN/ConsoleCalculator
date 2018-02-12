@@ -8,10 +8,13 @@ The calculator supports next operations
     - Division: '-'
     - Exponentiation '^'
     - Brackets: '()'
+    
 Precedence of operation:
     Brackets >> Degree >> Multiplication/Division >> Addition/Subtraction
+    
 Accuracy of calculations: 15 decimal places. You can change the parameter in file app.properties
 You can use '.' or/and ',' like delimiter of decimal places. You will get result always with '.'
+
 You can put spaces between numbers and operators, but you can't put spaces between digits.
 
 Available commands:
