@@ -1,6 +1,6 @@
 # ConsoleCalculator
 <pre>
-This is cmd string calculator. 
+This is a cmd string calculator. 
 The calculator supports next operations
     - Addition: '+'
     - Subtraction: '-'
