@@ -258,6 +258,44 @@ public class ControllerTest {
         assertEquals(expected, getData());
     }
 
+    @Test
+    public void test10() throws Exception {
+        //given
+        in.add("");
+        in.add("exit");
+
+        //when
+        new Controller().run();
+
+        //then
+        String expected = "Hello!" + LINE_SEPARATOR +
+                "Input your expression or 'help' for info" + LINE_SEPARATOR +
+                "Please, check your input. Expression can't be empty!" + LINE_SEPARATOR +
+                "Input your expression or 'help' for info" + LINE_SEPARATOR +
+                "Goodbye." + LINE_SEPARATOR;
+
+        assertEquals(expected, getData());
+    }
+
+    @Test
+    public void test11() throws Exception {
+        //given
+        in.add("   ");
+        in.add("exit");
+
+        //when
+        new Controller().run();
+
+        //then
+        String expected = "Hello!" + LINE_SEPARATOR +
+                "Input your expression or 'help' for info" + LINE_SEPARATOR +
+                "Please, check your input. Expression can't be empty!" + LINE_SEPARATOR +
+                "Input your expression or 'help' for info" + LINE_SEPARATOR +
+                "Goodbye." + LINE_SEPARATOR;
+
+        assertEquals(expected, getData());
+    }
+
     public String getData() {
         String result;
         try {
