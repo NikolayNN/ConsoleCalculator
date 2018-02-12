@@ -795,7 +795,7 @@ public class CalculatorTest {
     @Test
     public void calc71() throws Exception {
 
-        String expression = "(0-1)^2";
+        String expression = "-1^2";
         String expected = "1";
 
         String actual = calculator.calc(expression);
@@ -808,6 +808,17 @@ public class CalculatorTest {
 
         String expression = "-(0-1)^2";
         String expected = "-1";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc73() throws Exception {
+
+        String expression = "-(-(0-1))^2*2*(-1)";
+        String expected = "2";
 
         String actual = calculator.calc(expression);
 
