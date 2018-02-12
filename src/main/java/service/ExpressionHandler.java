@@ -1,24 +1,23 @@
 package service;
 
-import utils.Properties;
+import utils.Props;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The class prepared and check expression
+ * The class prepare and check expression
  */
 public class ExpressionHandler {
 
-    private final String SIGN_MINUS = Properties.read("sign.minus");
-    private final String SIGN_DEGREE = Properties.read("sign.degree");
-    private final static String OPEN_BRACKET = Properties.read("open.bracket");
-    private final String CLOSE_BRACKET = Properties.read("close.bracket");
-    private final String SEPARATOR = " ";
+    private final String SIGN_MINUS = Props.read("sign.minus");
+    private final String SIGN_DEGREE = Props.read("sign.degree");
+    private final static String OPEN_BRACKET = Props.read("open.bracket");
+    private final String CLOSE_BRACKET = Props.read("close.bracket");
 
     public String prepare(String expression) {
 
-        if (expression == null || expression.trim().equals("")) {
+        if (expression == null || expression.trim().length() == 0) {
             throw new RuntimeException("Expression can't be empty!");
         }
 
@@ -28,7 +27,7 @@ public class ExpressionHandler {
 
         expression = concat(OPEN_BRACKET, expression, CLOSE_BRACKET);
         expression = expression
-                .replace(SEPARATOR, "")
+                .replace(" ", "")
                 .replace(concat(OPEN_BRACKET, SIGN_MINUS), concat(OPEN_BRACKET, "0", SIGN_MINUS))
                 .replace(",", ".");
 

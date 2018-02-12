@@ -1,4 +1,5 @@
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -575,18 +576,86 @@ public class CalculatorTest {
     public void calc51() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of mathematical signs."));
+        expectedException.expectMessage(is("Invalid expression."));
 
-        String expression = "5++5";
+        String expression = "*5*5";
 
         calculator.calc(expression);
     }
 
     @Test
+    public void calc51a1() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "5+*5";
+
+        calculator.calc(expression);
+    }
+
+    @Test
+    public void calc51a2() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "5+5*";
+
+        calculator.calc(expression);
+    }
+
+    @Test
+    public void calc51a3() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "-+(5+5)";
+
+        calculator.calc(expression);
+    }
+
+    @Test
+    public void calc51a4() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "(5*-5)";
+
+        calculator.calc(expression);
+    }
+
+    @Test
+    public void calc51a5() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "^(5-5)";
+
+        calculator.calc(expression);
+    }
+
+    @Test
+    public void calc51a6() throws Exception {
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage(is("Invalid expression."));
+
+        String expression = "(5-5)^";
+
+        calculator.calc(expression);
+    }
+
+
+    @Test
     public void calc52() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of open and close brackets."));
+        expectedException.expectMessage(is("Wrong count of opening and closing brackets. " +
+                "Number of open brackets > number of closing brackets"));
 
         String expression = "(5+5";
 
@@ -597,7 +666,8 @@ public class CalculatorTest {
     public void calc53() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of open and close brackets."));
+        expectedException.expectMessage(is("Wrong count of opening and closing brackets. " +
+                "Number of open brackets < number of closing brackets"));
 
         String expression = "5+5)";
 
@@ -608,7 +678,8 @@ public class CalculatorTest {
     public void calc54() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of open and close brackets."));
+        expectedException.expectMessage(is("Wrong count of opening and closing brackets. " +
+                "Number of open brackets > number of closing brackets"));
 
         String expression = "(5+5)(";
 
@@ -619,7 +690,8 @@ public class CalculatorTest {
     public void calc55() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of open and close brackets."));
+        expectedException.expectMessage(is("Wrong count of opening and closing brackets. " +
+                "Number of open brackets > number of closing brackets"));
 
         String expression = "(5+5)(5";
 
@@ -630,7 +702,8 @@ public class CalculatorTest {
     public void calc56() throws Exception {
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(is("Wrong count of open and close brackets."));
+        expectedException.expectMessage(is("Wrong count of opening and closing brackets." +
+                " Number of open brackets < number of closing brackets"));
 
         String expression = "(5+5))5";
 
@@ -752,7 +825,7 @@ public class CalculatorTest {
     public void calc67() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(is("Wrong count of mathematical signs."));
+        expectedException.expectMessage(is("Invalid expression."));
 
         String expression = "+";
 
@@ -763,7 +836,7 @@ public class CalculatorTest {
     public void calc68() throws Exception {
 
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(is("Wrong count of mathematical signs."));
+        expectedException.expectMessage(is("Invalid expression."));
 
         String expression = "((+-";
 
@@ -824,4 +897,137 @@ public class CalculatorTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void calc74() throws Exception {
+
+        String expression = "10^2-(6*4+1)*5+5*3^2";
+        String expected = "20";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc75() throws Exception {
+
+        String expression = "10-(6+1)+5*5^2";
+        String expected = "128";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc76() throws Exception {
+
+        String expression = "10-(6*4+1)*5+5*3^2";
+        String expected = "-70";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc77() throws Exception {
+
+        String expression = "10-(6+1)*5+5*3^2";
+        String expected = "20";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc78() throws Exception {
+
+        String expression = "10-(6+1)+5*3^2";
+        String expected = "48";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc79() throws Exception {
+
+        String expression = "10-(6+1)*5+5";
+        String expected = "-20";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc80() throws Exception {
+
+        String expression = "10-5*(6/2+1)+5";
+        String expected = "-5";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc81() throws Exception {
+
+        String expression = "10-(6/2+1)+5";
+        String expected = "11";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc83() throws Exception {
+
+        String expression = "10-(6/2+1)*5+5";
+        String expected = "-5";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc84() throws Exception {
+
+        String expression = "2 + 1 - 6 / (1 + 2)";
+        String expected = "1";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc85() throws Exception {
+
+        String expression = "2 + 2 * 3 - 4";
+        String expected = "4";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void calc86() throws Exception {
+
+        String expression = "6^2/2+4";
+        String expected = "22";
+
+        String actual = calculator.calc(expression);
+
+        assertEquals(expected, actual);
+    }
+
 }

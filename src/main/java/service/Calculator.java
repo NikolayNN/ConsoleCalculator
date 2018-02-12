@@ -1,160 +1,182 @@
 package service;
 
-import utils.Properties;
+import utils.Props;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.EmptyStackException;
-import java.util.Stack;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Calculator {
 
-    private final String SIGN_PLUS = Properties.read("sign.plus");
-    private final String SIGN_MINUS = Properties.read("sign.minus");
-    private final String SIGN_MULTIPLICATION = Properties.read("sign.multiplication");
-    private final String SIGN_DIVISION = Properties.read("sign.division");
-    private final String SIGN_DEGREE = Properties.read("sign.degree");
-    private final String OPEN_BRACKET = Properties.read("open.bracket");
-    private final String CLOSE_BRACKET = Properties.read("close.bracket");
-
-    private final String AVAILABLE_FUNCTIONS = SIGN_PLUS + SIGN_MINUS + SIGN_MULTIPLICATION + SIGN_DIVISION
-            + SIGN_DEGREE;
-
-    private final int PRECEDENCE_SUM_AND_DIFFERENCE = Properties.readInt("precedence.sum.and.difference");
-    private final int PRECEDENCE_DIVISION_AND_MULTIPLICATION = Properties.readInt("precedence.division.and.multiplication");
-    private final int PRECEDENCE_DEGREE = Properties.readInt("precedence.degree");
-
-    private final int ACCURACY = Properties.readInt("accuracy");
+    private final String SIGN_PLUS = Props.read("sign.plus");
+    private final String SIGN_MINUS = Props.read("sign.minus");
+    private final String SIGN_MULTIPLICATION = Props.read("sign.multiplication");
+    private final String SIGN_DIVISION = Props.read("sign.division");
+    private final String SIGN_DEGREE = Props.read("sign.degree");
+    private final String CLOSE_BRACKET = Props.read("close.bracket");
+    private final String OPEN_BRACKET = Props.read("open.bracket");
+    private final int ACCURACY = Props.readInt("accuracy");
+    private final Map<String, Integer> AVAILABLE_FUNCTIONS;
 
     private ExpressionHandler expressionHandler;
 
     public Calculator(ExpressionHandler expressionHandler) {
         this.expressionHandler = expressionHandler;
+        this.AVAILABLE_FUNCTIONS = new HashMap<>();
+        AVAILABLE_FUNCTIONS.put(SIGN_MINUS, Props.readInt("precedence.difference"));
+        AVAILABLE_FUNCTIONS.put(SIGN_PLUS, Props.readInt("precedence.sum"));
+        AVAILABLE_FUNCTIONS.put(SIGN_DIVISION, Props.readInt("precedence.division"));
+        AVAILABLE_FUNCTIONS.put(SIGN_MULTIPLICATION, Props.readInt("precedence.multiplication"));
+        AVAILABLE_FUNCTIONS.put(SIGN_DEGREE, Props.readInt("precedence.degree"));
     }
-
 
     public String calc(String expression) {
 
-        Stack<String> operands = new Stack();
-        Stack<String> functions = new Stack();
+        expression = expressionHandler.prepare(expression);
 
-        StringTokenizer expressionTokens = new StringTokenizer(expressionHandler.prepare(expression),
-                AVAILABLE_FUNCTIONS + OPEN_BRACKET + CLOSE_BRACKET, true);
+        String rpn = receiveReversePolishNotationString(expression);
 
-        String result;
-        try {
-            result = solve(operands, functions, expressionTokens);
-        } catch (EmptyStackException ex){
-            throw new IllegalArgumentException("Wrong count of mathematical signs.");
-        }
-        return result;
-    }
+        StringTokenizer rpnTokenizer = new StringTokenizer(rpn, " ");
+        Stack<BigDecimal> operands = new Stack<>();
+        while (rpnTokenizer.hasMoreTokens()) {
 
-    private String solve(Stack<String> operands, Stack<String> functions, StringTokenizer expressionTokens) {
+            String currentToken = rpnTokenizer.nextToken();
 
-        while (expressionTokens.hasMoreTokens()) {
-
-            String token = expressionTokens.nextToken();
-
-            if (isNumber(token)) {
-                operands.push(token);
-                continue;
-            }
-            if (isOpenBracket(token)) {
-                functions.push(token);
-                continue;
-            }
-            if (!isFunction(token) && !token.equals(CLOSE_BRACKET)) {
-                throw new IllegalArgumentException(
-                        String.format("The token is unacceptable: '%s'", token));
+            if (isBrackets(currentToken)) {
+                throw new IllegalArgumentException("Wrong count of opening and closing brackets. " +
+                        "Number of open brackets > number of closing brackets");
             }
 
-            if (functions.size() > 0) {
-                if (getPrecedence(functions.lastElement()) >= getPrecedence(token)) {
-                    if (isCloseBracket(token)) {
-                        String currentFunction;
-                        while (!isOpenBracket((currentFunction = functions.pop()))) {
-                            operands.push(doFunction(operands.pop(), operands.pop(), currentFunction));
-                        }
-                    } else {
-                        operands.push(doFunction(operands.pop(), operands.pop(), functions.pop()));
-                        functions.push(token);
-                    }
-                } else {
-                    functions.push(token);
-                }
+            if (!isFunction(currentToken)) {
+                operands.push(toBigDecimal(currentToken));
             } else {
-                functions.push(token);
+                try {
+                    operands.push(doFunction(operands.pop(), operands.pop(), currentToken));
+                } catch (EmptyStackException ex) {
+                    throw new IllegalArgumentException("Invalid expression.");
+                }
             }
         }
 
-        if (operands.size() == 1 && functions.size() == 0) {
-            return new BigDecimal(operands.get(0)).stripTrailingZeros().toPlainString();
-        } else {
-            throw new RuntimeException("Wrong count of open and close brackets.");
+        if (operands.size() != 1) {
+            throw new IllegalArgumentException("Invalid expression.");
         }
+
+        return operands.pop().stripTrailingZeros().toPlainString();
     }
 
-    private int getPrecedence(String operator) {
-        if (operator.equals(SIGN_PLUS) || operator.equals(SIGN_MINUS)) {
-            return PRECEDENCE_SUM_AND_DIFFERENCE;
-        }
-        if (operator.equals(SIGN_MULTIPLICATION) || operator.equals(SIGN_DIVISION)) {
-            return PRECEDENCE_DIVISION_AND_MULTIPLICATION;
-        }
-        if (operator.equals(SIGN_DEGREE)) {
-            return PRECEDENCE_DEGREE;
-        }
-        if (isOpenBracket(operator) || isCloseBracket(operator)) {
-            return 0;
-        }
-        throw new IllegalArgumentException(String.format("Operator %s is unacceptable", operator));
-    }
-
-    private String doFunction(String b, String a, String operator) {
-
-        BigDecimal numbA = new BigDecimal(a);
-        BigDecimal numbB = new BigDecimal(b);
-
-        if (operator.equals(SIGN_MINUS)) {
-            return String.valueOf(numbA.subtract(numbB).toString());
-        }
-        if (operator.equals(SIGN_PLUS)) {
-            return String.valueOf(numbA.add(numbB).toString());
-        }
-        if (operator.equals(SIGN_MULTIPLICATION)) {
-            return String.valueOf(numbA.multiply(numbB).toString());
-        }
-        if (operator.equals(SIGN_DIVISION)) {
-            return String.valueOf(numbA.divide(numbB, ACCURACY,RoundingMode.HALF_UP).toString());
-        }
-        if (operator.equals(SIGN_DEGREE)) {
-            return String.valueOf(numbA.pow(Integer.valueOf(b), MathContext.DECIMAL128));
-        }
-
-        throw new IllegalArgumentException(String.format("Function '%s' is not available", operator));
-    }
-
-    private boolean isOpenBracket(String token) {
-        return token.equals(OPEN_BRACKET);
-    }
-
-    private boolean isCloseBracket(String token) {
-        return token.equals(CLOSE_BRACKET);
+    private boolean isBrackets(String token) {
+        return token.equals(OPEN_BRACKET) || token.equals(CLOSE_BRACKET);
     }
 
     private boolean isFunction(String token) {
-        return AVAILABLE_FUNCTIONS.contains(token);
+        return AVAILABLE_FUNCTIONS.keySet().contains(token);
     }
 
-    private boolean isNumber(String token) {
+    private BigDecimal toBigDecimal(String token) {
         try {
-            new BigDecimal(token);
+            return new BigDecimal(token);
         } catch (NumberFormatException ex) {
-            return false;
+            throw new IllegalArgumentException(String.format("The token is unacceptable: '%s'", token));
         }
-        return true;
+    }
+
+    private BigDecimal doFunction(BigDecimal operandA, BigDecimal operandB, String functionToken) {
+        if (functionToken.equals(SIGN_MULTIPLICATION)) {
+            return operandB.multiply(operandA);
+        } else if (functionToken.equals(SIGN_DIVISION)) {
+            return operandB.divide(operandA, ACCURACY, RoundingMode.HALF_UP);
+        } else if (functionToken.equals(SIGN_PLUS)) {
+            return operandB.add(operandA);
+        } else if (functionToken.equals(SIGN_MINUS)) {
+            return operandB.subtract(operandA);
+        } else if (functionToken.equals(SIGN_DEGREE)) {
+            return operandB.pow(operandA.intValue(), MathContext.DECIMAL128);
+        }
+        throw new IllegalArgumentException(String.format("Function '%s' is not available", functionToken));
+    }
+
+    private String receiveReversePolishNotationString(String expression) {
+        try {
+            return doSortingStation(expression);
+        } catch (EmptyStackException ex) {
+            throw new IllegalArgumentException("Wrong count of opening and closing brackets. " +
+                    "Number of open brackets < number of closing brackets");
+        }
+    }
+
+    private String doSortingStation(String expression) {
+
+        final Set<String> functionSymbols = new HashSet<>(AVAILABLE_FUNCTIONS.keySet());
+        functionSymbols.add(OPEN_BRACKET);
+        functionSymbols.add(CLOSE_BRACKET);
+
+        List<String> out = new ArrayList<>();
+
+        Stack<String> functions = new Stack<>();
+
+        int index = 0;
+        while (true) {
+            int nextFunctionIndex = expression.length();
+            String nextFunction = "";
+            for (String function : functionSymbols) {
+                int i = expression.indexOf(function, index);
+                if (i >= 0 && i < nextFunctionIndex) {
+                    nextFunction = function;
+                    nextFunctionIndex = i;
+                }
+            }
+            if (nextFunctionIndex == expression.length()) {
+                break;
+            } else {
+                if (index != nextFunctionIndex) {
+                    out.add(expression.substring(index, nextFunctionIndex));
+                }
+                if (isOpeningBracket(nextFunction)) {
+                    functions.push(nextFunction);
+                } else if (isClosingBracket(nextFunction)) {
+                    while (!isOpeningBracket(functions.peek())) {
+                        out.add(functions.pop());
+                        if (functions.empty()) {
+                            throw new IllegalArgumentException("Wrong count of brackets");
+                        }
+                    }
+                    functions.pop();
+                } else {
+                    while (!functions.empty() && !isOpeningBracket(functions.peek()) &&
+                            (AVAILABLE_FUNCTIONS.get(nextFunction) <= AVAILABLE_FUNCTIONS.get(functions.peek()))) {
+                        out.add(functions.pop());
+                    }
+                    functions.push(nextFunction);
+                }
+                index = nextFunctionIndex + nextFunction.length();
+            }
+        }
+
+        if (index != expression.length()) {
+            out.add(expression.substring(index));
+        }
+
+        while (!functions.empty()) {
+            out.add(functions.pop());
+        }
+        StringBuilder result = new StringBuilder();
+        if (!out.isEmpty()) {
+            result.append(out.remove(0));
+        }
+        while (!out.isEmpty()) {
+            result.append(" ").append(out.remove(0));
+        }
+
+        return result.toString();
+    }
+
+    private boolean isOpeningBracket(String token) {
+        return token.equals(OPEN_BRACKET);
+    }
+
+    private boolean isClosingBracket(String token) {
+        return token.equals(CLOSE_BRACKET);
     }
 }

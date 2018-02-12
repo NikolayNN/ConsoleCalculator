@@ -2,13 +2,13 @@ package utils;
 
 import java.io.IOException;
 
-public class Properties {
+public class Props {
 
     private static final String FILENAME = "app.properties";
 
     public static String read(String propertyName) {
         java.util.Properties properties = new java.util.Properties();
-        ClassLoader loader = Properties.class.getClassLoader();
+        ClassLoader loader = Props.class.getClassLoader();
         try {
             properties.load(loader.getResourceAsStream(FILENAME));
         } catch (IOException e) {
@@ -19,7 +19,7 @@ public class Properties {
 
     public static int readInt(String propertyName) {
         java.util.Properties properties = new java.util.Properties();
-        ClassLoader loader = Properties.class.getClassLoader();
+        ClassLoader loader = Props.class.getClassLoader();
         try {
             properties.load(loader.getResourceAsStream(FILENAME));
         } catch (IOException e) {

@@ -1,21 +1,21 @@
 package controller.commands.impl;
 
 import controller.commands.Command;
-import utils.Properties;
+import utils.Props;
 
 public class HelpCommand extends Command {
 
     private final String LINE_SEPARATOR = System.lineSeparator();
 
-    private final String SIGN_PLUS = Properties.read("sign.plus");
-    private final String SIGN_MINUS = Properties.read("sign.minus");
-    private final String SIGN_MULTIPLICATION = Properties.read("sign.multiplication");
-    private final String SIGN_DIVISION = Properties.read("sign.division");
-    private final String SIGN_DEGREE = Properties.read("sign.degree");
-    private final String OPEN_BRACKET = Properties.read("open.bracket");
-    private final String CLOSE_BRACKET = Properties.read("close.bracket");
+    private final String SIGN_PLUS = Props.read("sign.plus");
+    private final String SIGN_MINUS = Props.read("sign.minus");
+    private final String SIGN_MULTIPLICATION = Props.read("sign.multiplication");
+    private final String SIGN_DIVISION = Props.read("sign.division");
+    private final String SIGN_DEGREE = Props.read("sign.degree");
+    private final String OPEN_BRACKET = Props.read("open.bracket");
+    private final String CLOSE_BRACKET = Props.read("close.bracket");
 
-    private final int ACCURACY = Properties.readInt("accuracy");
+    private final int ACCURACY = Props.readInt("accuracy");
 
     @Override
     public String perform() {
