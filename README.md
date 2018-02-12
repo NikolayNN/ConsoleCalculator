@@ -18,7 +18,7 @@ You can use '.' or/and ',' like delimiter of decimal places. You will get result
 You can put spaces between numbers and operators, but you can't put spaces between digits.
 
 Available commands:
-    stop - end the programm
+    exit - end the programm
     help - get the help information
     
 How to work with the program:

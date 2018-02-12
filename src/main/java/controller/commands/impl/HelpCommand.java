@@ -33,7 +33,7 @@ public class HelpCommand extends Command {
                 "You can use '.' or/and ',' like delimiter of decimal places. You will get result always with '.'" + LINE_SEPARATOR + LINE_SEPARATOR +
                 "You can put spaces between numbers and operators, but you can't put spaces between digits." + LINE_SEPARATOR +
                 "Available commands: " + LINE_SEPARATOR +
-                    "\tstop - end the programm" + LINE_SEPARATOR +
+                    "\texit - end the programm" + LINE_SEPARATOR +
                     "\thelp - get the information" + LINE_SEPARATOR + LINE_SEPARATOR +
                 "How to work with the program: " + LINE_SEPARATOR +
                     "\tAfter launch the program you should input expression and press enter." + LINE_SEPARATOR +
