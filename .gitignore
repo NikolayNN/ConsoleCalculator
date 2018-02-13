@@ -1,0 +1,9 @@
+### Java template
+*.class
+.idea
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
